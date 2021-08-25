@@ -1,12 +1,13 @@
-import dotenv from 'dotenv';
 import express from 'express';
 import morgan from 'morgan';
+import config from './configs';
+import { connectToDB } from './configs/connectDB';
 import routes from './routes';
 
-// Load enviroment variables
-dotenv.config({ path: './config.env' });
-
 const app = express();
+
+// Connect to MongoDB
+connectToDB(config.MONGO_URI as string);
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {
@@ -15,7 +16,7 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use('/api/v1', routes);
 
-const PORT = process.env.PORT || 4000;
+const PORT = config.PORT;
 
 app.listen(PORT, () =>
 	console.log(`Server started in ${process.env.NODE_ENV} mode on port ${PORT}`)
