@@ -1,4 +1,5 @@
 dist
+resources
 node_modules
 src/configs/.env
 src/configs/development.ts
