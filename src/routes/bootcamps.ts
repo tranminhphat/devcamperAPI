@@ -5,7 +5,7 @@ import {
 	getBootCamp,
 	getBootCamps,
 	updateBootCamp,
-} from '../controllers/bootcampControllers';
+} from '../controllers/bootcamp';
 
 const router = express.Router();
 

@@ -6,6 +6,9 @@ import routes from './routes';
 
 const app = express();
 
+// Parse the request body
+app.use(express.json());
+
 // Connect to MongoDB
 connectToDB(config.MONGO_URI as string);
 
