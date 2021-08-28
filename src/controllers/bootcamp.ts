@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import asyncHandler from '../middlewares/asyncHandler';
 import {
 	createBootcamp,
 	deleteBootcampById,
@@ -13,20 +14,14 @@ import ErrorResponse from '../utils/ErrorResponse';
  * @route		GET /api/v1/bootcamps
  * @access	Public
  */
-export const getBootCamps = async (
-	_req: Request,
-	res: Response,
-	next: NextFunction
-) => {
-	try {
+export const getBootCamps = asyncHandler(
+	async (_req: Request, res: Response) => {
 		const bootcamps = await fetchBootcamps();
 		res
 			.status(200)
 			.json({ success: true, count: bootcamps.length, data: bootcamps });
-	} catch (err) {
-		next(err);
 	}
-};
+);
 
 /**
  * @desc		Get single bootcamp
