@@ -5,8 +5,8 @@ export const createBootcamp = async (input: BootcampInput) => {
 	return await Bootcamp.create(input);
 };
 
-export const fetchBootcamps = async () => {
-	return await Bootcamp.find();
+export const fetchBootcamps = async (queryObj: any) => {
+	return await Bootcamp.find(queryObj);
 };
 
 export const fetchBootcampById = async (bootcampId: string) => {

@@ -17,8 +17,16 @@ import geocoder from '../utils/GeoCoder';
  * @access	Public
  */
 export const getBootCamps = asyncHandler(
-	async (_req: Request, res: Response) => {
-		const bootcamps = await fetchBootcamps();
+	async (req: Request, res: Response) => {
+		let queryStr = JSON.stringify(req.query);
+		queryStr = queryStr.replace(
+			/\b(gt|gte|lt|lte|in)\b/g,
+			(match) => `$${match}`
+		);
+
+		const queryObj = JSON.parse(queryStr);
+
+		const bootcamps = await fetchBootcamps(queryObj);
 		res
 			.status(200)
 			.json({ success: true, count: bootcamps.length, data: bootcamps });
