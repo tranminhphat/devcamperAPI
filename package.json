@@ -6,6 +6,8 @@
   "scripts": {
     "watch": "tsc -w",
     "dev": "set NODE_ENV=development&&nodemon dist/index.js",
+		"seed": "set NODE_ENV=development&&node dist/seeder.js -i",
+		"unseed": "set NODE_ENV=development&&node dist/seeder.js -d",
     "start": "set NODE_ENV=production&&node dist/index.js"
   },
   "repository": {
