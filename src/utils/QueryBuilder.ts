@@ -1,7 +1,7 @@
 const queryBuilder = (query: any, queryRequest: any) => {
 	const queryReq = { ...queryRequest };
 	// Fields to exclude
-	const removeFields = ['select'];
+	const removeFields = ['select', 'sort', 'page', 'limit'];
 	removeFields.forEach((param) => delete queryReq[param]);
 
 	let filterStr = JSON.stringify(queryReq);
@@ -28,6 +28,13 @@ const queryBuilder = (query: any, queryRequest: any) => {
 	} else {
 		query = query.sort('-createdAt');
 	}
+
+	//query with pagination
+	const page = parseInt(queryRequest.page, 10) || 1;
+	const limit = parseInt(queryRequest.limit, 10) || 1;
+	const skip = (page - 1) * limit;
+
+	query = query.skip(skip).limit(limit);
 
 	return query;
 };
