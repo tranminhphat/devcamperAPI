@@ -26,3 +26,16 @@ export const updateBootcampById = async (
 export const deleteBootcampById = async (bootcampId: string) => {
 	return await Bootcamp.findByIdAndDelete(bootcampId);
 };
+
+export const fetchBootcampsByRadius = async (
+	lat: number,
+	lng: number,
+	radius: number
+) => {
+	// https://docs.mongodb.com/manual/reference/operator/query/centerSphere/
+	return await Bootcamp.find({
+		location: {
+			$geoWithin: { $centerSphere: [[lng, lat], radius] },
+		},
+	});
+};
