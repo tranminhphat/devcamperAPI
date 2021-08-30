@@ -32,15 +32,3 @@ export const createSortString = (sort?: string) => {
 
 	return sortBy;
 };
-
-export const createPaginationObject = (limit?: string, page?: string) => {
-	const realPage = page ? parseInt(page, 10) : 1;
-	const realLimit = limit ? parseInt(limit, 10) : 2;
-	const skip = (realPage - 1) * realLimit;
-
-	return {
-		skip,
-		page: realPage,
-		limit: realLimit,
-	};
-};

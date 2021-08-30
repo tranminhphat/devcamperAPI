@@ -1,13 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import asyncHandler from '../middlewares/asyncHandler';
-import {
-	createBootcamp,
-	deleteBootcampById,
-	fetchBootcampById,
-	fetchBootcamps,
-	fetchBootcampsByRadius,
-	updateBootcampById,
-} from '../services/bootcamp';
+import Bootcamp from '../models/Bootcamp';
 import ErrorResponse from '../utils/ErrorResponse';
 import geocoder from '../utils/GeoCoder';
 import * as ServiceUtils from '../utils/ServiceUtils';
@@ -19,26 +12,55 @@ import * as ServiceUtils from '../utils/ServiceUtils';
  */
 export const getBootCamps = asyncHandler(
 	async (req: Request, res: Response) => {
-		const { select, limit, page, sort } = req.query;
+		const { select, sort, limit, page } = req.query;
+		let query;
 
+		//Filters
 		const filterObj = ServiceUtils.createFilterObject(req.query);
-		const selectString = ServiceUtils.createSelectString(select as string);
-		const sortString = ServiceUtils.createSortString(sort as string);
-		const paginationObj = ServiceUtils.createPaginationObject(
-			limit as string,
-			page as string
-		);
+		query = Bootcamp.find(filterObj);
 
-		const bootcamps = await fetchBootcamps(
-			filterObj,
-			selectString,
-			sortString,
-			paginationObj
-		);
+		//Selected fields
+		const selectStr = ServiceUtils.createSelectString(select as string);
+		query = query.select(selectStr);
 
-		res
-			.status(200)
-			.json({ success: true, count: bootcamps.length, data: bootcamps });
+		// Sort by field
+		const sortBy = ServiceUtils.createSortString(sort as string);
+		query = query.sort(sortBy);
+
+		// Pagination
+		const realPage = page ? parseInt(page as string, 10) : 1;
+		const realLimit = limit ? parseInt(limit as string, 10) : 2;
+		const startIndex = (realPage - 1) * realLimit;
+		const endIndex = realPage * realLimit;
+		const total = await Bootcamp.countDocuments();
+
+		query.skip(startIndex).limit(realLimit);
+
+		const bootcamps = await query;
+
+		// Pagination result
+		let pagination: any = {};
+
+		if (endIndex < total) {
+			pagination.next = {
+				limit: realLimit,
+				page: realPage + 1,
+			};
+		}
+
+		if (startIndex > 0) {
+			pagination.prev = {
+				limit: realLimit,
+				page: realPage - 1,
+			};
+		}
+
+		res.status(200).json({
+			pagination,
+			success: true,
+			count: bootcamps.length,
+			data: bootcamps,
+		});
 	}
 );
 
@@ -49,7 +71,7 @@ export const getBootCamps = asyncHandler(
  */
 export const getBootCamp = asyncHandler(
 	async (req: Request, res: Response, next: NextFunction) => {
-		const bootcamp = await fetchBootcampById(req.params.id);
+		const bootcamp = await Bootcamp.findById(req.params.id);
 		if (!bootcamp) {
 			next(
 				new ErrorResponse(404, `Bootcamp not found with id of ${req.params.id}`)
@@ -68,7 +90,7 @@ export const getBootCamp = asyncHandler(
  */
 export const createBootCamp = asyncHandler(
 	async (req: Request, res: Response, _next: NextFunction) => {
-		const bootcamp = await createBootcamp(req.body);
+		const bootcamp = await Bootcamp.create(req.body);
 		res.status(201).json({ success: true, data: bootcamp });
 	}
 );
@@ -80,7 +102,10 @@ export const createBootCamp = asyncHandler(
  */
 export const updateBootCamp = asyncHandler(
 	async (req: Request, res: Response, next: NextFunction) => {
-		const bootcamp = await updateBootcampById(req.params.id, req.body);
+		const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
+			new: true,
+			runValidators: true,
+		});
 
 		if (!bootcamp) {
 			next(
@@ -100,7 +125,7 @@ export const updateBootCamp = asyncHandler(
  */
 export const deleteBootCamp = asyncHandler(
 	async (req: Request, res: Response, next: NextFunction) => {
-		const bootcamp = await deleteBootcampById(req.params.id);
+		const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
 
 		if (!bootcamp) {
 			next(
@@ -132,7 +157,11 @@ export const getBootcampsInRadius = asyncHandler(
 		// Earth's radius = 3,963 mi
 		const radius = parseInt(distance) / 3963;
 
-		const bootcamps = await fetchBootcampsByRadius(lat, lng, radius);
+		const bootcamps = await Bootcamp.find({
+			location: {
+				$geoWithin: { $centerSphere: [[lng, lat], radius] },
+			},
+		});
 
 		res.status(200).json({
 			success: true,
