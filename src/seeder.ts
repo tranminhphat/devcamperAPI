@@ -2,6 +2,7 @@ import fs from 'fs';
 import mongoose from 'mongoose';
 import config from './configs';
 import Bootcamp from './models/Bootcamp';
+import Course from './models/Course';
 
 // Connect to DB
 mongoose.connect(config.MONGO_URI as string);
@@ -10,11 +11,15 @@ mongoose.connect(config.MONGO_URI as string);
 const bootcamps = JSON.parse(
 	fs.readFileSync(`${__dirname}/data/bootcamps.json`, 'utf-8')
 );
+const courses = JSON.parse(
+	fs.readFileSync(`${__dirname}/data/courses.json`, 'utf-8')
+);
 
 // Import data to DB
 const importData = async () => {
 	try {
 		await Bootcamp.create(bootcamps);
+		await Course.create(courses);
 		console.log('Data imported successfully ✓');
 		process.exit();
 	} catch (err) {
@@ -26,6 +31,7 @@ const importData = async () => {
 const deleteData = async () => {
 	try {
 		await Bootcamp.deleteMany();
+		await Course.deleteMany();
 		console.log('Data deleted successfully ✓');
 		process.exit();
 	} catch (err) {
