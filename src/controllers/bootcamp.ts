@@ -10,6 +10,7 @@ import {
 } from '../services/bootcamp';
 import ErrorResponse from '../utils/ErrorResponse';
 import geocoder from '../utils/GeoCoder';
+import * as ServiceUtils from '../utils/ServiceUtils';
 
 /**
  * @desc		Get all bootcamps
@@ -18,7 +19,23 @@ import geocoder from '../utils/GeoCoder';
  */
 export const getBootCamps = asyncHandler(
 	async (req: Request, res: Response) => {
-		const bootcamps = await fetchBootcamps(req.query);
+		const { select, limit, page, sort } = req.query;
+
+		const filterObj = ServiceUtils.createFilterObject(req.query);
+		const selectString = ServiceUtils.createSelectString(select as string);
+		const sortString = ServiceUtils.createSortString(sort as string);
+		const paginationObj = ServiceUtils.createPaginationObject(
+			limit as string,
+			page as string
+		);
+
+		const bootcamps = await fetchBootcamps(
+			filterObj,
+			selectString,
+			sortString,
+			paginationObj
+		);
+
 		res
 			.status(200)
 			.json({ success: true, count: bootcamps.length, data: bootcamps });

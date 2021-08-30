@@ -1,15 +1,22 @@
 import Bootcamp from '../models/Bootcamp';
 import { BootcampInput } from '../types/bootcamp';
-import queryBuilder from '../utils/QueryBuilder';
 
 export const createBootcamp = async (input: BootcampInput) => {
 	return await Bootcamp.create(input);
 };
 
-export const fetchBootcamps = async (queryRequest: any) => {
-	const query = Bootcamp.find();
-	const q = queryBuilder(query, queryRequest);
-	return await q;
+export const fetchBootcamps = async (
+	filterObj: any,
+	selectStr?: string,
+	sortStr?: string,
+	paginationObj?: any
+) => {
+	let query = Bootcamp.find(filterObj);
+	query = query.select(selectStr);
+	query = query.sort(sortStr);
+	query = query.skip(paginationObj.skip).limit(paginationObj.limit);
+
+	return await query;
 };
 
 export const fetchBootcampById = async (bootcampId: string) => {
