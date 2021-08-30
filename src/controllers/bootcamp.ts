@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import asyncHandler from '../middlewares/asyncHandler';
 import Bootcamp from '../models/Bootcamp';
+import { PaginationResult } from '../types/PaginationResult';
 import ErrorResponse from '../utils/ErrorResponse';
 import geocoder from '../utils/GeoCoder';
 import * as ServiceUtils from '../utils/ServiceUtils';
@@ -29,7 +30,7 @@ export const getBootCamps = asyncHandler(
 
 		// Pagination
 		const realPage = page ? parseInt(page as string, 10) : 1;
-		const realLimit = limit ? parseInt(limit as string, 10) : 2;
+		const realLimit = limit ? parseInt(limit as string, 10) : 25;
 		const startIndex = (realPage - 1) * realLimit;
 		const endIndex = realPage * realLimit;
 		const total = await Bootcamp.countDocuments();
@@ -39,7 +40,7 @@ export const getBootCamps = asyncHandler(
 		const bootcamps = await query;
 
 		// Pagination result
-		let pagination: any = {};
+		let pagination: PaginationResult = {};
 
 		if (endIndex < total) {
 			pagination.next = {
