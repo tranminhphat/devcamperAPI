@@ -129,7 +129,7 @@ export const updateBootCamp = asyncHandler(
  */
 export const deleteBootCamp = asyncHandler(
 	async (req: Request, res: Response, next: NextFunction) => {
-		const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
+		const bootcamp = await Bootcamp.findById(req.params.id);
 
 		if (!bootcamp) {
 			next(
@@ -137,6 +137,8 @@ export const deleteBootCamp = asyncHandler(
 			);
 			return;
 		}
+
+		bootcamp.remove();
 
 		res.status(200).json({ success: true, data: {} });
 	}
