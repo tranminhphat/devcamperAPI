@@ -18,7 +18,10 @@ export const getBootCamps = asyncHandler(
 
 		//Filters
 		const filterObj = ServiceUtils.createFilterObject(req.query);
-		query = Bootcamp.find(filterObj);
+		query = Bootcamp.find(filterObj).populate({
+			path: 'courses',
+			select: 'title description',
+		});
 
 		//Selected fields
 		const selectStr = ServiceUtils.createSelectString(select as string);

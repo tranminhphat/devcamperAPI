@@ -95,7 +95,11 @@ const bootcampSchema = new mongoose.Schema(
 			default: false,
 		},
 	},
-	{ timestamps: true }
+	{
+		timestamps: true,
+		toJSON: { virtuals: true },
+		toObject: { virtuals: true },
+	}
 );
 
 // Create bootcamp slug from the name
@@ -121,6 +125,14 @@ bootcampSchema.pre('save', async function (next) {
 	// Do not save address in DB
 	this.address = undefined;
 	next();
+});
+
+// Add a virtual field that relate one to many with courses
+bootcampSchema.virtual('courses', {
+	ref: 'Course',
+	localField: '_id',
+	foreignField: 'bootcamp',
+	justOne: false,
 });
 
 const Bootcamp = mongoose.model('Bootcamp', bootcampSchema);
