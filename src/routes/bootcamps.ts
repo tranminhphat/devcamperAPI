@@ -6,6 +6,7 @@ import {
 	getBootCamps,
 	getBootcampsInRadius,
 	updateBootCamp,
+	uploadPhoto,
 } from '../controllers/bootcamp';
 import coursesRouter from './courses';
 
@@ -19,6 +20,7 @@ router.get('/:id', getBootCamp);
 router.get('/radius/:zipcode/:distance', getBootcampsInRadius);
 router.post('/', createBootCamp);
 router.put('/:id', updateBootCamp);
+router.put('/:id/photo', uploadPhoto);
 router.delete('/:id', deleteBootCamp);
 
 export default router;

@@ -1,5 +1,7 @@
 import express from 'express';
+import fileUpload from 'express-fileupload';
 import morgan from 'morgan';
+import path from 'path';
 import config from './configs';
 import { connectToDB } from './configs/connectDB';
 import errorHandler from './middlewares/errorHandler';
@@ -18,6 +20,10 @@ if (process.env.NODE_ENV === 'development') {
 	app.use(morgan('dev'));
 }
 
+// Set static folder
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(fileUpload());
 app.use('/api/v1', routes);
 app.use(errorHandler);
 

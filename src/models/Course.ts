@@ -38,7 +38,6 @@ const courseSchema = new mongoose.Schema(
 );
 
 courseSchema.statics.updateBootcampAverageCost = async function (bootcampId) {
-	console.log('Calculating average cost...');
 	const query = await this.aggregate([
 		{
 			$match: { bootcamp: bootcampId },
