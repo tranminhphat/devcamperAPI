@@ -4,10 +4,8 @@ import path from 'path';
 import config from '../configs';
 import asyncHandler from '../middlewares/asyncHandler';
 import Bootcamp from '../models/Bootcamp';
-import { PaginationResult } from '../types/PaginationResult';
 import ErrorResponse from '../utils/ErrorResponse';
 import geocoder from '../utils/GeoCoder';
-import * as ServiceUtils from '../utils/ServiceUtils';
 
 /**
  * @desc		Get all bootcamps
@@ -15,59 +13,8 @@ import * as ServiceUtils from '../utils/ServiceUtils';
  * @access	Public
  */
 export const getBootCamps = asyncHandler(
-	async (req: Request, res: Response) => {
-		const { select, sort, limit, page } = req.query;
-		let query;
-
-		//Filters
-		const filterObj = ServiceUtils.createFilterObject(req.query);
-		query = Bootcamp.find(filterObj).populate({
-			path: 'courses',
-			select: 'title description',
-		});
-
-		//Selected fields
-		const selectStr = ServiceUtils.createSelectString(select as string);
-		query = query.select(selectStr);
-
-		// Sort by field
-		const sortBy = ServiceUtils.createSortString(sort as string);
-		query = query.sort(sortBy);
-
-		// Pagination
-		const realPage = page ? parseInt(page as string, 10) : 1;
-		const realLimit = limit ? parseInt(limit as string, 10) : 25;
-		const startIndex = (realPage - 1) * realLimit;
-		const endIndex = realPage * realLimit;
-		const total = await Bootcamp.countDocuments();
-
-		query.skip(startIndex).limit(realLimit);
-
-		const bootcamps = await query;
-
-		// Pagination result
-		let pagination: PaginationResult = {};
-
-		if (endIndex < total) {
-			pagination.next = {
-				limit: realLimit,
-				page: realPage + 1,
-			};
-		}
-
-		if (startIndex > 0) {
-			pagination.prev = {
-				limit: realLimit,
-				page: realPage - 1,
-			};
-		}
-
-		res.status(200).json({
-			pagination,
-			success: true,
-			count: bootcamps.length,
-			data: bootcamps,
-		});
+	async (_req: Request, res: Response) => {
+		res.status(200).json((res as any).advancedResult);
 	}
 );
 
