@@ -39,3 +39,25 @@ export const authRoute = asyncHandler(
 		}
 	}
 );
+
+export enum UserRole {
+	ADMIN = 'admin',
+	PUBLISHER = 'publisher',
+	USER = 'user',
+}
+
+// Grant access to specific roles
+export const authorizeRole =
+	(...roles: string[]) =>
+	(req: any, _res: Response, next: NextFunction) => {
+		if (!roles.includes(req.user.role)) {
+			return next(
+				new ErrorResponse(
+					403,
+					`User role ${req.user.role} is not authorized to access this route`
+				)
+			);
+		}
+
+		next();
+	};
