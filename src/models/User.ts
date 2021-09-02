@@ -35,13 +35,6 @@ const userSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
-// Create signed JWT
-userSchema.methods.getSignedJwt = function () {
-	return jwt.sign({ id: this._id }, config.JWT_SECRET as string, {
-		expiresIn: config.JWT_EXPIRE,
-	});
-};
-
 // Encrypted password before save in DB
 userSchema.pre('save', async function (next) {
 	const salt = await bcrypt.genSalt(10);
@@ -49,6 +42,18 @@ userSchema.pre('save', async function (next) {
 
 	next();
 });
+
+// Create signed JWT
+userSchema.methods.getSignedJwt = function () {
+	return jwt.sign({ id: this._id }, config.JWT_SECRET as string, {
+		expiresIn: config.JWT_EXPIRE,
+	});
+};
+
+// Match entered password to hashed password in DB
+userSchema.methods.matchPassword = async function (enteredPassword: string) {
+	return await bcrypt.compare(enteredPassword, this.password);
+};
 
 const User = mongoose.model('User', userSchema);
 
