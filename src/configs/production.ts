@@ -9,4 +9,5 @@ export default {
 	MAX_FILE_UPLOAD_SIZE: process.env.MAX_FILE_UPLOAD_SIZE,
 	JWT_SECRET: process.env.JWT_SECRET,
 	JWT_EXPIRE: process.env.JWT_EXPIRE,
+	JWT_COOKIE_EXPIRE: process.env.JWT_COOKIE_EXPIRE,
 };

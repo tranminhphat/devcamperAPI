@@ -1,3 +1,6 @@
+import { Response } from 'express';
+import config from '../configs';
+
 export const createFilterObject = (queryRequest: any) => {
 	const queryReq = { ...queryRequest };
 	// Fields to exclude
@@ -31,4 +34,26 @@ export const createSortString = (sort?: string) => {
 	}
 
 	return sortBy;
+};
+
+export const sendTokenResponse = (
+	user: any,
+	statusCode: number,
+	res: Response
+) => {
+	const token = user.getSignedJwt();
+
+	const options = {
+		expires: new Date(
+			Date.now() +
+				parseInt(config.JWT_COOKIE_EXPIRE as string) * 24 * 60 * 60 * 1000
+		),
+		httpOnly: true,
+		secure: process.env.NODE_ENV === 'production',
+	};
+
+	res
+		.status(statusCode)
+		.cookie('token', token, options)
+		.json({ token, success: true });
 };

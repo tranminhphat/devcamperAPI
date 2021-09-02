@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import asyncHandler from '../middlewares/asyncHandler';
 import User from '../models/User';
 import ErrorResponse from '../utils/ErrorResponse';
+import { sendTokenResponse } from '../utils/ServiceUtils';
 
 /**
  * @desc		Register user
@@ -18,10 +19,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 		role,
 	})) as any;
 
-	// Create JWT token
-	const token = user.getSignedJwt();
-
-	res.status(201).json({ token, success: true });
+	sendTokenResponse(user, 201, res);
 });
 
 /**
@@ -52,9 +50,6 @@ export const login = asyncHandler(
 			return;
 		}
 
-		// Create JWT token
-		const token = user.getSignedJwt();
-
-		res.status(201).json({ token, success: true });
+		sendTokenResponse(user, 200, res);
 	}
 );

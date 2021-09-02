@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import express from 'express';
 import fileUpload from 'express-fileupload';
 import morgan from 'morgan';
@@ -11,6 +12,9 @@ const app = express();
 
 // Parse the request body
 app.use(express.json());
+
+// Parse cookie object
+app.use(cookieParser());
 
 // Connect to MongoDB
 connectToDB(config.MONGO_URI as string);
