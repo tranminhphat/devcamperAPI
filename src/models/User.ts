@@ -1,5 +1,7 @@
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import config from '../configs';
 
 const userSchema = new mongoose.Schema(
 	{
@@ -33,6 +35,14 @@ const userSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
+// Create signed JWT
+userSchema.methods.getSignedJwt = function () {
+	return jwt.sign({ id: this._id }, config.JWT_SECRET as string, {
+		expiresIn: config.JWT_EXPIRE,
+	});
+};
+
+// Encrypted password before save in DB
 userSchema.pre('save', async function (next) {
 	const salt = await bcrypt.genSalt(10);
 	this.password = await bcrypt.hash(this.password, salt);

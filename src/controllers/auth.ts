@@ -10,12 +10,15 @@ import User from '../models/User';
 export const register = asyncHandler(async (req: Request, res: Response) => {
 	const { name, email, password, role } = req.body;
 
-	const user = await User.create({
+	const user = (await User.create({
 		name,
 		email,
 		password,
 		role,
-	});
+	})) as any;
 
-	res.status(201).json({ success: true, data: user._id });
+	// Create JWT token
+	const token = user.getSignedJwt();
+
+	res.status(201).json({ token, success: true });
 });
