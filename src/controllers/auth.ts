@@ -53,3 +53,14 @@ export const login = asyncHandler(
 		sendTokenResponse(user, 200, res);
 	}
 );
+
+/**
+ * @desc		Get the current user
+ * @route		GET /api/v1/auth/me
+ * @access	Public
+ */
+export const getMe = asyncHandler(
+	async (req: any, res: Response, _next: NextFunction) => {
+		res.status(200).json({ success: true, data: (req as any).user });
+	}
+);
