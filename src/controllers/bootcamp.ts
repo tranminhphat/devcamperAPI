@@ -3,6 +3,7 @@ import { UploadedFile } from 'express-fileupload';
 import path from 'path';
 import config from '../configs';
 import asyncHandler from '../middlewares/asyncHandler';
+import { UserRole } from '../middlewares/authRoute';
 import Bootcamp from '../models/Bootcamp';
 import ErrorResponse from '../utils/ErrorResponse';
 import geocoder from '../utils/GeoCoder';
@@ -43,7 +44,23 @@ export const getBootCamp = asyncHandler(
  * @access	Private
  */
 export const createBootCamp = asyncHandler(
-	async (req: Request, res: Response, _next: NextFunction) => {
+	async (req: Request & { user: any }, res: Response, next: NextFunction) => {
+		// Add user to req.body
+		req.body.user = req.user.id;
+
+		// Check for published bootcamp
+		const publishedBootcamp = await Bootcamp.findOne({ user: req.user.id });
+
+		// If the user is not an admin, they can only add one bootcamp
+		if (publishedBootcamp && req.user.role !== UserRole.ADMIN) {
+			return next(
+				new ErrorResponse(
+					400,
+					`The user with ID ${req.user.id} has already published a bootcamp`
+				)
+			);
+		}
+
 		const bootcamp = await Bootcamp.create(req.body);
 		res.status(201).json({ success: true, data: bootcamp });
 	}
