@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import asyncHandler from '../middlewares/asyncHandler';
+import { UserRole } from '../middlewares/authRoute';
 import Bootcamp from '../models/Bootcamp';
 import Course from '../models/Course';
 import ErrorResponse from '../utils/ErrorResponse';
@@ -57,16 +58,31 @@ export const getCourse = asyncHandler(
  * @access	Private
  */
 export const createCourse = asyncHandler(
-	async (req: Request, res: Response, next: NextFunction) => {
+	async (req: Request & { user: any }, res: Response, next: NextFunction) => {
 		// Include the bootcamp ID in the form body
 		req.body.bootcamp = req.params.bootcampId;
+		// Include the user Id in the form body
+		req.body.user = req.user.id;
 
-		const bootcamp = Bootcamp.findById(req.params.bootcampId);
+		const bootcamp = (await Bootcamp.findById(req.params.bootcampId)) as any;
 		if (!bootcamp) {
 			next(
 				new ErrorResponse(404, `Bootcamp not found with id of ${req.params.id}`)
 			);
 			return;
+		}
+
+		// Make sure user is bootcamp owner to add course
+		if (
+			bootcamp.user.toString() !== req.user.id &&
+			req.user.role !== UserRole.ADMIN
+		) {
+			return next(
+				new ErrorResponse(
+					404,
+					`User ${req.user.id} is not authorized to add a course to bootcamp ${bootcamp._id}`
+				)
+			);
 		}
 
 		const course = await Course.create(req.body);
@@ -81,11 +97,8 @@ export const createCourse = asyncHandler(
  * @access	Private
  */
 export const updateCourse = asyncHandler(
-	async (req: Request, res: Response, next: NextFunction) => {
-		const course = await Course.findByIdAndUpdate(req.params.id, req.body, {
-			new: true,
-			runValidators: true,
-		});
+	async (req: Request & { user: any }, res: Response, next: NextFunction) => {
+		let course = (await Course.findById(req.params.id)) as any;
 
 		if (!course) {
 			next(
@@ -93,6 +106,24 @@ export const updateCourse = asyncHandler(
 			);
 			return;
 		}
+
+		// Make sure user is course owner
+		if (
+			course.user.toString() !== req.user.id &&
+			req.user.role !== UserRole.ADMIN
+		) {
+			return next(
+				new ErrorResponse(
+					404,
+					`User ${req.user.id} is not authorized to update course ${course._id}`
+				)
+			);
+		}
+
+		course = await Course.findByIdAndUpdate(req.params.id, req.body, {
+			new: true,
+			runValidators: true,
+		});
 
 		res.status(200).json({ success: true, data: course });
 	}
@@ -104,14 +135,27 @@ export const updateCourse = asyncHandler(
  * @access	Private
  */
 export const deleteCourse = asyncHandler(
-	async (req: Request, res: Response, next: NextFunction) => {
-		const course = await Course.findById(req.params.id);
+	async (req: Request & { user: any }, res: Response, next: NextFunction) => {
+		const course = (await Course.findById(req.params.id)) as any;
 
 		if (!course) {
 			next(
 				new ErrorResponse(404, `Course not found with id of ${req.params.id}`)
 			);
 			return;
+		}
+
+		// Make sure user is course owner
+		if (
+			course.user.toString() !== req.user.id &&
+			req.user.role !== UserRole.ADMIN
+		) {
+			return next(
+				new ErrorResponse(
+					404,
+					`User ${req.user.id} is not authorized to update course ${course._id}`
+				)
+			);
 		}
 
 		course.remove();
