@@ -64,3 +64,25 @@ export const getMe = asyncHandler(
 		res.status(200).json({ success: true, data: (req as any).user });
 	}
 );
+
+/**
+ * @desc		Forgot password
+ * @route		POST /api/v1/auth/forgotpassword
+ * @access	Public
+ */
+export const forgotPassord = asyncHandler(
+	async (req: any, res: Response, next: NextFunction) => {
+		const user = (await User.findOne({ email: req.body.email })) as any;
+
+		if (!user) {
+			return next(new ErrorResponse(404, 'There is no user with that email'));
+		}
+
+		// Get reset password token
+		user.getResetPasswordToken();
+
+		await user.save({ validateBeforeSave: false });
+
+		res.status(200).json({ success: true, data: user });
+	}
+);
