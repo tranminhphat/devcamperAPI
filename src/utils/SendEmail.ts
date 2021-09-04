@@ -8,6 +8,8 @@ interface MessageOptions {
 }
 
 const sendEmail = async (options: MessageOptions) => {
+	console.log('config.STMP_EMAIL = ', config.SMTP_EMAIL);
+	console.log('config.STMP_EMAIL = ', config.SMTP_PASSWORD);
 	const transporter = nodemailer.createTransport({
 		host: config.SMTP_HOST,
 		port: config.SMTP_PORT,
