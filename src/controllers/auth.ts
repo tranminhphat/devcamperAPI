@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import asyncHandler from '../middlewares/asyncHandler';
 import User from '../models/User';
 import ErrorResponse from '../utils/ErrorResponse';
+import sendEmail from '../utils/SendEmail';
 import { sendTokenResponse } from '../utils/ServiceUtils';
 
 /**
@@ -79,10 +80,33 @@ export const forgotPassord = asyncHandler(
 		}
 
 		// Get reset password token
-		user.getResetPasswordToken();
+		const resetToken = user.getResetPasswordToken();
 
 		await user.save({ validateBeforeSave: false });
 
-		res.status(200).json({ success: true, data: user });
+		// Create reset url
+		const resetUrl = `${req.protocol}://${req.get(
+			'host'
+		)}/api/v1/resetpassword/${resetToken}`;
+
+		const message = `You are receiving this email because you (or someone else) has requested the reset of password. Please make a PUT request to: \n\n ${resetUrl}`;
+
+		try {
+			await sendEmail({
+				message,
+				email: user.email,
+				subject: 'Password reset token',
+			});
+
+			res.status(200).json({ success: true, data: 'Email sent' });
+		} catch (err) {
+			console.error(err);
+			user.resetPasswordToken = undefined;
+			user.resetPasswordExpire = undefined;
+
+			await user.save({ validateBeforeSave: false });
+
+			return next(new ErrorResponse(500, 'Email could not be sent'));
+		}
 	}
 );
