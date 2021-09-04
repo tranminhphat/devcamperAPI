@@ -4,7 +4,7 @@ import { PaginationResult } from '../types/PaginationResult';
 import * as ServiceUtils from '../utils/ServiceUtils';
 
 const advancedResult =
-	(model: Model<any, any, any>, populate: any) =>
+	(model: Model<any, any, any>, populate?: any) =>
 	async (req: Request, res: Response, next: NextFunction) => {
 		const { select, sort, limit, page } = req.query;
 		let query;

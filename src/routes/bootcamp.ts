@@ -11,7 +11,7 @@ import {
 import advancedResult from '../middlewares/advancedResult';
 import { authorizeRole, authRoute, UserRole } from '../middlewares/authRoute';
 import Bootcamp from '../models/Bootcamp';
-import coursesRouter from './courses';
+import coursesRouter from './course';
 
 const router = express.Router();
 
