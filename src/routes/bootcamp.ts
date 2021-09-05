@@ -12,11 +12,13 @@ import advancedResult from '../middlewares/advancedResult';
 import { authorizeRole, authRoute, UserRole } from '../middlewares/authRoute';
 import Bootcamp from '../models/Bootcamp';
 import coursesRouter from './course';
+import reviewRouter from './review';
 
 const router = express.Router();
 
 // Re-route into other resource routers
 router.use('/:bootcampId/courses', coursesRouter);
+router.use('/:bootcampId/reviews', reviewRouter);
 
 router.get('/', advancedResult(Bootcamp, 'courses'), getBootCamps);
 router.get('/:id', getBootCamp);
