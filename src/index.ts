@@ -1,7 +1,9 @@
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import express from 'express';
 import fileUpload from 'express-fileupload';
 import mongoSanitize from 'express-mongo-sanitize';
+import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
@@ -29,8 +31,22 @@ if (process.env.NODE_ENV === 'development') {
 // Set static folder
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Sanitize data
 app.use(mongoSanitize());
+
+// Security headers
 app.use(helmet());
+
+// Enable cors
+app.use(cors());
+
+// Limit requests
+const limiter = rateLimit({
+	windowMs: 10 * 60 * 1000, // 10 minutes
+	max: 100, // limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
+
 app.use(fileUpload());
 app.use('/api/v1', routes);
 app.use(errorHandler);
