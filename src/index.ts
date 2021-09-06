@@ -2,6 +2,7 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 import fileUpload from 'express-fileupload';
 import mongoSanitize from 'express-mongo-sanitize';
+import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
 import config from './configs';
@@ -29,6 +30,7 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(mongoSanitize());
+app.use(helmet());
 app.use(fileUpload());
 app.use('/api/v1', routes);
 app.use(errorHandler);
