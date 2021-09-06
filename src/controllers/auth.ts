@@ -57,6 +57,22 @@ export const login = asyncHandler(
 );
 
 /**
+ * @desc		Log out user / Clear cookie
+ * @route		GET /api/v1/auth/logout
+ * @access	Public
+ */
+export const logout = asyncHandler(
+	async (_req: any, res: Response, _next: NextFunction) => {
+		res.clearCookie('token');
+
+		res.status(200).json({
+			success: true,
+			data: {},
+		});
+	}
+);
+
+/**
  * @desc		Get the current user
  * @route		GET /api/v1/auth/me
  * @access	Public

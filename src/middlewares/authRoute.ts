@@ -15,13 +15,14 @@ export const authRoute = asyncHandler(
 		) {
 			// Authorization: Bearer dslgifyu82o4rldmshganfdsklm.2hjl345
 			token = req.headers.authorization.split(' ')[1];
+		} else if (req.cookies.token) {
+			token = req.cookies.token;
 		}
-		// else if(req.cookies.token){
-		// 	token = req.cookies.token;
-		//}
 
 		if (!token) {
-			return next(new ErrorResponse(401, 'Not authorize to access this route'));
+			return next(
+				new ErrorResponse(401, 'Not authorized to access this route')
+			);
 		}
 
 		try {
@@ -35,7 +36,9 @@ export const authRoute = asyncHandler(
 			next();
 		} catch (err) {
 			console.error(err);
-			return next(new ErrorResponse(401, 'Not authorize to access this route'));
+			return next(
+				new ErrorResponse(401, 'Not authorized to access this route')
+			);
 		}
 	}
 );
