@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "watch": "yarn copy&tsc -w",
-    "copy": "copyfiles -f src/public/uploads/* dist/public/uploads",
+    "copy": "copyfiles -u 1 src/public/**/* dist",
     "dev": "set NODE_ENV=development&&nodemon dist/index.js",
     "seed": "set NODE_ENV=development&&node dist/seeder.js -i",
     "unseed": "set NODE_ENV=development&&node dist/seeder.js -d",
