@@ -108,4 +108,4 @@ Create the backend for a bootcamp directory website. The frontend/UI will be cre
 
 ## Preview
 
-![DevCamper API.](./src/public/review.png 'UI review.')
+![DevCamper API.](./review.png 'UI review.')
