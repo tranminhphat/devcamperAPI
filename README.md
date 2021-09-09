@@ -4,7 +4,7 @@ Backend API for DevCamper application to manage bootcamps, courses, reviews, use
 
 ## Specifications
 
-Create the backend for a bootcamp directory website. The frontend/UI will be created by another team (future course). The html/css template has been created and can be used as a reference for functionality. All of the functionality below needs to be fully implmented in this project.
+Create the backend for a bootcamp directory website. All of the functionality below needs to be fully implemented in this project.
 
 ### Bootcamps
 
